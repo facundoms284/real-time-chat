@@ -1,8 +1,8 @@
 import { styled } from '@mui/material/styles';
 import Button from '@mui/material/Button';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
-
 import { useState } from 'react';
+import { uploadImage } from '../../../api/images';
 
 const VisuallyHiddenInput = styled('input')({
   clip: 'rect(0 0 0 0)',
@@ -10,13 +10,11 @@ const VisuallyHiddenInput = styled('input')({
   height: 1,
   overflow: 'hidden',
   position: 'absolute',
-  bottom: 0,
-  left: 0,
   whiteSpace: 'nowrap',
   width: 1,
 });
 
-const MessageInput = ({ onSendMessage }) => {
+const MessageInput = ({ onSendMessage, currentSocketId }) => {
   const [input, setInput] = useState('');
 
   const handleSubmit = (e) => {
@@ -27,56 +25,38 @@ const MessageInput = ({ onSendMessage }) => {
     }
   };
 
-  const handleFileChange = async (event) => {
-    const files = event.target.files;
-    console.log('filess', files);
-    if (files) {
-      //formdata
-      const formData = new FormData();
-      formData.append('file', files[0]);
-
-      try {
-        //peticion al backend
-        const response = await fetch('http://localhost:3000/images/upload', {
-          method: 'POST',
-          body: formData,
-        });
-
-        if (response.ok) {
-          const data = await response.json();
-          console.log(
-            'data llego correctamente al frontend desde el backend',
-            data
-          );
-        } else {
-          console.log('Error al subir la imagennn');
-        }
-      } catch (error) {
-        console.log('Error en la petición de subir imagen', error);
-      }
-    }
+  const handleUploadImage = (e) => {
+    uploadImage(e, currentSocketId);
   };
 
   return (
-    <form id="form" onSubmit={handleSubmit}>
+    <form
+      onSubmit={handleSubmit}
+      className="w-full max-w-2xl flex items-center bg-gray-300 bg-opacity-50 p-3 rounded-lg shadow-lg gap-2 fixed bottom-2"
+    >
       <input
-        id="input"
+        className="flex-grow border border-gray-400 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
         value={input}
         onChange={(e) => setInput(e.target.value)}
         autoComplete="off"
+        placeholder="Type your message..."
       />
-      <button type="submit">Send</button>
+      <button
+        type="submit"
+        className="bg-blue-500 text-white rounded-lg px-4 py-2 hover:bg-blue-600 transition duration-200"
+      >
+        Send
+      </button>
       <Button
         component="label"
-        role={undefined}
+        className="ml-2"
         variant="contained"
-        tabIndex={-1}
         startIcon={<CloudUploadIcon />}
       >
-        Upload files
+        Upload
         <VisuallyHiddenInput
           type="file"
-          onChange={handleFileChange}
+          onChange={handleUploadImage}
           multiple={false}
         />
       </Button>

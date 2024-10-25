@@ -1,32 +1,33 @@
-const { message } = require('antd');
+const { io } = require('../index');
+
 const MessagesModel = require('../models/messages');
 const messagesModel = new MessagesModel();
 
 class MessagesController {
   async add(req, res) {
     try {
-      const { content } = req.body;
-      const messageData = { content };
+      const { content, userId } = req.body;
+
+      const messageData = { content, userId };
+      console.log('messageData desde controller', messageData);
       const newMessage = await messagesModel.add(messageData);
-      res.status(201).json({ message: 'Mensaje enviado', newMessage });
+
+      io.emit('chat message', newMessage);
+
+      res.status(201).json({ newMessage });
     } catch (error) {
       console.log(error);
       res.status(500).json({ message: 'Error al enviar mensaje', error });
     }
   }
 
-  async delete(req, res) {
+  async getAll(req, res) {
     try {
-      const { id } = req.params;
-      console.log('id del mensaje a eliminar desde controller', id);
-      const deletedMessage = await messagesModel.delete({ id });
-      res.status(200).json({
-        message: 'Mensaje eliminado desde el controller',
-        id: deletedMessage,
-      });
+      const messages = await messagesModel.getAll();
+      res.status(200).json(messages);
     } catch (error) {
       console.log(error);
-      res.status(500).json({ message: 'Error al eliminar mensaje', error });
+      res.status(500).json({ message: 'Error al obtener los mensajes', error });
     }
   }
 }

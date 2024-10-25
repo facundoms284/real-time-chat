@@ -1,8 +1,9 @@
+//Multer config
 const multer = require('multer');
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, './src/public/uploads'); // carpeta para almacenar las imágenes
+    cb(null, './src/public/uploads'); // Carpeta para almacenar las imágenes
   },
   filename: (req, file, cb) => {
     const filename = `${Date.now()}-${file.originalname}`;
@@ -13,7 +14,7 @@ const storage = multer.diskStorage({
 const upload = multer({
   storage,
   limits: {
-    fileSize: 1024 * 1024 * 2, // limito a 2 mb
+    fileSize: 1024 * 1024 * 2,
   },
   fileFilter: (req, file, cb) => {
     const validTypes = ['image/jpeg', 'image/png', 'image/jpg', 'image/gif'];

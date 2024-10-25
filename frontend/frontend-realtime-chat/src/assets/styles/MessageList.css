@@ -1,0 +1,9 @@
+/* Para navegadores WebKit (Chrome, Safari) */
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* Para Firefox */
+.hide-scrollbar {
+  scrollbar-width: none;
+}

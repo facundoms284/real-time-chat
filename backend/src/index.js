@@ -1,11 +1,10 @@
 const express = require('express');
 const cors = require('cors');
+const path = require('path');
 
+// Socket.io configurado para usar con Express
 const { Server } = require('socket.io');
 const { createServer } = require('http');
-
-const Database = require('./helpers/database');
-const DB = new Database('images');
 
 // Aplicacion express y servidor HTTp
 const app = express();
@@ -19,23 +18,18 @@ const io = new Server(server, {
 module.exports = { io };
 
 io.on('connection', (socket) => {
-  console.log('a user connected');
-
-  //broadcast: para emitir el mensaje a todos los usuarios conectados
-  socket.on('chat message', (msg) => {
-    console.log('Emitiendo mensaje de texto a todos los usuarios', msg);
-    io.emit('chat message', msg);
+  // Emitir evento al cliente cuando un usuario se conecta
+  socket.on('login', (data) => {
+    socket.userId = data.id;
+    io.emit('user connected', `${socket.userId} se ha conectado`);
   });
 
   socket.on('disconnect', () => {
-    console.log('user disconnected');
+    if (socket.userId) {
+      // Emitir evento al cliente cuando un usuario se desconecta
+      io.emit('user disconnected', `${socket.userId} se ha desconectado`);
+    }
   });
-});
-
-// Traigo las variables de entorno desde la raíz del proyecto para usarlas aquí en el Backend.
-const path = require('path');
-const result = require('dotenv').config({
-  path: path.resolve(__dirname, '../../.env'),
 });
 
 // Middlewares

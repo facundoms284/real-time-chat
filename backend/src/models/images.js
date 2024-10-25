@@ -1,16 +1,7 @@
 const Database = require('../helpers/database');
-const DB = new Database('images');
+const DB = new Database('messages');
 
 class ImagesModel {
-  async getAll() {
-    const images = await DB.getAll();
-
-    return images.map((image) => ({
-      id: image.id,
-      url: image.url,
-    }));
-  }
-
   async getOne(filename) {
     const images = await DB.getAll();
     const image = images.find((image) => image.filename === filename);
@@ -29,14 +20,17 @@ class ImagesModel {
   }
 
   async add(imageData) {
-    const { file } = imageData;
+    const { file, userId } = imageData;
     const id = crypto.randomUUID();
     const fileName = file.filename;
+    const type = 'image';
 
     const newImage = {
-      filename: fileName,
       id,
+      filename: fileName,
+      type,
       url: `http://localhost:3000/images/${fileName}`,
+      userId,
     };
 
     await DB.add(newImage);

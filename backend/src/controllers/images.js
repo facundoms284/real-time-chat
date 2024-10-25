@@ -7,29 +7,31 @@ const fs = require('fs');
 const { io } = require('../index');
 
 class ImagesController {
-  // Agregar una nueva imagen
   async add(req, res) {
     try {
       const { file } = req;
+      const { userId } = req.body;
+      console.log('userId', userId);
 
       if (!file) {
         return res.status(400).json({ message: 'Archivo no subido' });
       }
 
-      // Lógica de añadir imagen en el modelo
-      const imageData = { file };
+      const imageData = { file, userId };
       const newImage = await imagesModel.add(imageData);
-      console.log(newImage);
+      console.log(
+        'Emitiendo imagen para todos los usuarios conectados desde el Backend'
+      );
       io.emit('new image', newImage);
 
-      res.status(201).json(newImage); // cuando conecte con el front, extraer de newImage la url: newImage.url
+      res.status(201).json(newImage);
     } catch (error) {
       console.log(error);
       res.status(500).json({ message: 'Error al subir la imagen', error });
     }
   }
 
-  // obtener todas las imagenes
+  // Obtener todas las imagenes
   async getAll(req, res) {
     try {
       const images = await imagesModel.getAll();
